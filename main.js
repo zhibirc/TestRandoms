@@ -1,3 +1,7 @@
+/**
+ * @file Module that provides randomizer engines quality tool.
+ * @author Yaroslav Surilov
+ */
 (function ( global ) {
     'use strict';
 
@@ -7,16 +11,19 @@
      * @param {Function} engine randomizer
      * @param {number} digits amount of random digits for test
      * @param {Function} stdout output engine
+     * @param {string} graphDirection output graphic orientation
      */
-    function testRandoms ( engine, digits, stdout ) {
+    function testRandoms ( engine, digits, stdout, graphDirection ) {
         var randomsMatrix = '0000000000'.split('').map(Number),
             output = '',
-            eof = '\n',
+            eol = '\n',
             acc = 0,
             i = digits,
             max,
             randomDigit,
             truncRandomDigit;
+
+        graphDirection = graphDirection || 'h';
 
         while ( i-- ) {
             randomDigit = engine();
@@ -27,15 +34,21 @@
 
         max = Math.max.apply(null, randomsMatrix);
 
-        while ( max ) {
+        if ( graphDirection === 'h' ) {
             for ( i = 0; i < 10; i += 1) {
-                output += (randomsMatrix[i] < max ? ' ' : '*');
+                output += Array(randomsMatrix[i] + 1).join('\u25ac')+ eol;
             }
-            max -= 1;
-            output += eof;
+        } else {
+            while ( max ) {
+                for ( i = 0; i < 10; i += 1) {
+                    output += (randomsMatrix[i] < max ? ' ' : '\u25ae');
+                }
+                max -= 1;
+                output += eol;
+            }
         }
 
-        output += 'Average: ' + acc / digits + eof;
+        output += eol + 'Average: ' + acc / digits + eol;
 
         stdout(output);
     }
